@@ -1,6 +1,7 @@
 //! Utility functions
 
 use hl::*;
+use cl::*;
 
 pub fn create_compute_context() -> Result<(Device, Context, CommandQueue), &'static str>
 {
@@ -15,7 +16,7 @@ pub fn create_compute_context() -> Result<(Device, Context, CommandQueue), &'sta
     } else {
         let device = devices.remove(0);
         let context = device.create_context();
-        let queue = context.create_command_queue(&device);
+        let queue = context.create_command_queue(&device, None);
         Ok((device, context, queue))
     }
 }
@@ -29,6 +30,14 @@ pub enum PreferedType {
 
     CPUOnly,
     GPUOnly,
+}
+
+#[derive(Copy, Clone)]
+pub enum CommandQueueProperties {
+    None,
+    Profiling,
+    OutOfOrder,
+    All,
 }
 
 pub fn create_compute_context_prefer(cltype: PreferedType) -> Result<(Device, Context, CommandQueue), &'static str>
@@ -45,7 +54,7 @@ pub fn create_compute_context_prefer(cltype: PreferedType) -> Result<(Device, Co
         if devices.len() > 0 {
             let device = devices.remove(0);
             let context = device.create_context();
-            let queue = context.create_command_queue(&device);
+            let queue = context.create_command_queue(&device, None);
             return Ok((device, context, queue))
         }
     }
@@ -57,4 +66,9 @@ pub fn create_compute_context_prefer(cltype: PreferedType) -> Result<(Device, Co
         PreferedType::GPUPrefered => create_compute_context(),
         _ => Err("Could not find valid implementation")
     }
+}
+
+pub fn create_compue_context_custom(cltype: PreferedType, queueopts: CommandQueueProperties) -> Result<(Device, Context, CommandQueue), &'static str>
+{
+
 }

@@ -314,15 +314,20 @@ impl Context {
         })
     }
 
-    pub fn create_command_queue(&self, device: &Device) -> CommandQueue
+    pub fn create_command_queue(&self, device: &Device, properties: Option<cl_command_queue_properties>) -> CommandQueue
     {
         unsafe
         {
             let mut errcode = 0;
 
+            let flags = match properties {
+                Some(p) => p, 
+                None => 0,
+            };
+
             let cqueue = clCreateCommandQueue(self.ctx,
                                               device.id,
-                                              CL_QUEUE_PROFILING_ENABLE,
+                                              flags,
                                               (&mut errcode));
 
             check(errcode, "Failed to create command queue!");
